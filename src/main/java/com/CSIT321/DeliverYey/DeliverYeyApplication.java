@@ -25,30 +25,4 @@ public class DeliverYeyApplication {
 	public BCryptPasswordEncoder bCryptPasswordEncoder() {
 		return new BCryptPasswordEncoder();
 	}
-	@Bean
-	public WebMvcConfigurer corsConfigurer() {
-		return new WebMvcConfigurer() {
-			@Override
-			public void addCorsMappings(CorsRegistry registry) {
-				registry.addMapping("/**")
-						.allowedOrigins("http://localhost:5173", "http://jivswebsite.com")
-						.allowedMethods("GET", "POST", "PUT", "DELETE")
-						.allowedHeaders("*")
-						.allowCredentials(true)
-						.maxAge(3600);
-			}
-		};
-	}
-
-	@EventListener(ApplicationReadyEvent.class)
-	public void checkConnectivity() {
-		try {
-			// Ping the database to check connectivity
-			jdbcTemplate.execute("SELECT 1");
-			System.out.println("Database connectivity check successful.");
-		} catch (Exception e) {
-			// Handle any exceptions
-			System.err.println("Database connectivity check failed: " + e.getMessage());
-		}
-	}
 }

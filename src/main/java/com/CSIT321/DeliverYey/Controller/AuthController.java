@@ -1,12 +1,12 @@
 package com.CSIT321.DeliverYey.Controller;
 
+import com.CSIT321.DeliverYey.Entity.StudentEntity;
 import com.CSIT321.DeliverYey.Response.AuthResponse;
 import org.springframework.security.core.Authentication;
 import com.CSIT321.DeliverYey.Service.StaffService;
 import com.CSIT321.DeliverYey.Service.StudentService;
 import com.CSIT321.DeliverYey.Config.JwtProvider;
 import com.CSIT321.DeliverYey.DTOs.LoginUserDTO;
-import com.CSIT321.DeliverYey.Entity.StudentEntity;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -22,8 +22,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-@RequestMapping("/login")
-public class LoginController {
+@RequestMapping("/auth")
+public class AuthController {
     @Autowired
     private StudentService studentService;
 
@@ -34,13 +34,17 @@ public class LoginController {
     PasswordEncoder passwordEncoder;
 
 
+    @PostMapping(path = "/signup",
+            consumes = MediaType.APPLICATION_JSON_VALUE,
+            produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<?> registerUser(@Valid @RequestBody StudentEntity input) {
+        return studentService.signup(input);
+    }
 
-
-    @PostMapping(path = "/student",
+    @PostMapping(path = "/signin",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginStudent(@Valid @RequestBody LoginUserDTO input) {
-
         return login(input);
     }
 
