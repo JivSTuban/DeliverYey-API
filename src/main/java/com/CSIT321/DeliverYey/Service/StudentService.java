@@ -1,11 +1,16 @@
 package com.CSIT321.DeliverYey.Service;
 
+import com.CSIT321.DeliverYey.Config.JwtProvider;
 import com.CSIT321.DeliverYey.Repository.StudentRepository;
 import com.CSIT321.DeliverYey.Entity.StudentEntity;
 import com.CSIT321.DeliverYey.Entity.UserType;
+import com.CSIT321.DeliverYey.Response.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -32,7 +37,7 @@ public class StudentService implements UserDetailsService {
         StudentEntity student = studentRepository.findByIdNumberAndIsDeletedFalse(idNumber);
         if (student != null){
             return User.builder()
-                    .username(student.getEmail())
+                    .username(student.getIdNumber())
                     .password(student.getPassword())
                     .roles(String.valueOf(student.getUserType()))
                     .build();
@@ -69,7 +74,18 @@ public class StudentService implements UserDetailsService {
         student.setDeleted(false);
 
         studentRepository.save(student);
-        return ResponseEntity.status(HttpStatus.CREATED).body(student);
+
+        Authentication authentication = new UsernamePasswordAuthenticationToken(input.getIdNumber(),input.getPassword());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        String token = JwtProvider.generateToken(authentication);
+
+
+        AuthResponse authResponse = new AuthResponse();
+        authResponse.setJwt(token);
+        authResponse.setMessage("Register Success");
+        authResponse.setStatus(true);
+        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
+
     }
 
     public List<StudentEntity> getAllStudent() {

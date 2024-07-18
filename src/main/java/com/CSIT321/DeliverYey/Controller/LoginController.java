@@ -1,5 +1,7 @@
 package com.CSIT321.DeliverYey.Controller;
 
+import com.CSIT321.DeliverYey.Response.AuthResponse;
+import org.springframework.security.core.Authentication;
 import com.CSIT321.DeliverYey.Service.StaffService;
 import com.CSIT321.DeliverYey.Service.StudentService;
 import com.CSIT321.DeliverYey.Config.JwtProvider;
@@ -12,7 +14,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
+
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,7 +41,7 @@ public class LoginController {
             produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> loginStudent(@Valid @RequestBody LoginUserDTO input) {
 
-
+        return login(input);
     }
 
     private Authentication authenticate(String idNumber, String password) {
@@ -48,7 +50,7 @@ public class LoginController {
 
         UserDetails userDetails = studentService.loadUserByUsername(idNumber);
 
-        System.out.println("Sig in in user details"+ userDetails);
+        System.out.println("Sign in user details"+ userDetails);
 
         if(userDetails == null) {
             System.out.println("Sign in details - null" + userDetails);
@@ -81,19 +83,6 @@ public class LoginController {
         authResponse.setMessage("Login success");
         authResponse.setJwt(token);
         authResponse.setStatus(true);
-        StudentEntity myUser = studentRepository.findByIdNumberAndIsDeletedTrue(userDto.getIdNumber());
-
-        if (myUser != null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"This account is in a state of deletion. Would you like to recover it?\"}");
-        }
-
-        myUser = studentRepository.findByIdNumberAndIsDeletedFalse(userDto.getIdNumber());
-        if (myUser == null) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Incorrect student ID\"}");
-        }
-        if (!passwordEncoder.matches(userDto.getPassword(), myUser.getPassword())){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("{\"message\": \"Incorrect Password\"}");
-        }
-        return ResponseEntity.status(HttpStatus.OK).body("{\"message\": \"Login Successful\"}");
+        return new ResponseEntity<>(authResponse,HttpStatus.OK);
     }
 }
