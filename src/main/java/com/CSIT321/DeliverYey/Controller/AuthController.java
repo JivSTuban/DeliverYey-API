@@ -6,6 +6,7 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -22,14 +23,14 @@ public class AuthController {
     @PostMapping(path = "/signup",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ReqRes registerUser(@Valid @RequestBody ReqRes input) {
+    public ResponseEntity<ReqRes> registerUser(@Valid @RequestBody ReqRes input) {
         return authService.register(input);
     }
 
     @PostMapping(path = "/signin",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
-    public ReqRes loginStudent(@Valid @RequestBody ReqRes input) {
+    public ResponseEntity<ReqRes> loginStudent(@Valid @RequestBody ReqRes input) {
         return authService.login(input);
     }
 

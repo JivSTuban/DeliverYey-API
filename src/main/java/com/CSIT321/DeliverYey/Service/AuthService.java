@@ -5,11 +5,14 @@ import com.CSIT321.DeliverYey.Entity.StudentEntity;
 import com.CSIT321.DeliverYey.Entity.UserType;
 import com.CSIT321.DeliverYey.Repository.StudentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -37,31 +40,35 @@ public class AuthService {
     @Autowired
     private StudentService studentService;
 
-    public ReqRes register(ReqRes registrationRequest){
+    public ResponseEntity<ReqRes> register(ReqRes registrationRequest) {
+        ReqRes response = new ReqRes();
 
-        try{
+        try {
+            // Check if there are deleted accounts and whether the account is recoverable
             if (studentRepository.count() > 0) {
                 if (studentRepository.findByIdNumberAndIsDeletedTrue(registrationRequest.getIdNumber()) != null) {
-                    registrationRequest.setMessage("{\"message\": \"This account was already deleted. Would you like to recover this account?\"}");
-                    return registrationRequest;
+                    response.setMessage("{\"message\": \"This account was already deleted. Would you like to recover this account?\"}");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
                 }
             }
-        }catch(NullPointerException e){
+        } catch (NullPointerException e) {
             System.out.println("There are no deleted accounts yet.");
         }
 
+        // Check if the ID number is already in use
         if (studentRepository.findByIdNumberAndIsDeletedFalse(registrationRequest.getIdNumber()) != null) {
-            registrationRequest.setMessage("{\"message\": \"ID number is already in use\"}");
-            return registrationRequest;
+            response.setMessage("{\"message\": \"ID number is already in use\"}");
+            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
+        // Validate password format
         if (!isValidPassword(registrationRequest.getPassword())) {
-            throw new IllegalArgumentException("Invalid password format. It must be at least 8 characters with 1 uppercase letter.");
+            response.setMessage("Invalid password format. It must be at least 8 characters with 1 uppercase letter.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
-
-        ReqRes resp = new ReqRes();
 
         try {
+            // Create and save the new student
             var student = new StudentEntity();
             student.setIdNumber(registrationRequest.getIdNumber());
             student.setEmail(registrationRequest.getEmail());
@@ -71,18 +78,23 @@ public class AuthService {
 
             StudentEntity newStudent = studentRepository.save(student);
 
-            if (student.getSid()>0) {
-                resp.setStudent((newStudent));
-                resp.setMessage("User Saved Successfully");
-                resp.setStatusCode(200);
+            if (newStudent.getSid() > 0) {
+                response.setStudent(newStudent);
+                response.setMessage("User Saved Successfully");
+                response.setStatusCode(200);
+                return ResponseEntity.ok(response);
             }
 
-        }catch (Exception e){
-            resp.setStatusCode(500);
-            resp.setError(e.getMessage());
+        } catch (Exception e) {
+            response.setStatusCode(500);
+            response.setError(e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return resp;
+
+        response.setMessage("An unexpected error occurred.");
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }
+
 
     private Authentication authenticate(String idNumber, String password) {
 
@@ -107,13 +119,15 @@ public class AuthService {
 
     }
 
-    public ReqRes login(ReqRes loginRequest) {
+    public ResponseEntity<ReqRes> login(ReqRes loginRequest) {
         ReqRes response = new ReqRes();
         try {
-            authenticationManager
-                    .authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getIdNumber(),
-                            loginRequest.getPassword()));
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginRequest.getIdNumber(), loginRequest.getPassword()));
             var user = studentRepository.findByIdNumberAndIsDeletedFalse(loginRequest.getIdNumber());
+            if(user == null) {
+                throw new BadCredentialsException("User not found");
+            }
             var jwt = jwtUtils.generateToken(user);
             var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
             response.setStatusCode(200);
@@ -123,15 +137,20 @@ public class AuthService {
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
 
-        }catch (Exception e){
+            return ResponseEntity.ok(response);
+        } catch (AuthenticationException e) {
+            response.setStatusCode(401);
+            response.setMessage("Incorrect ID number or password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        } catch (Exception e) {
             response.setStatusCode(500);
-            response.setMessage(e.getMessage());
+            response.setMessage("An unexpected error occurred: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
         }
-        return response;
     }
 
     private boolean isValidPassword(String password) {
         // Password should be at least 8 characters with 1 uppercase letter
-        return password.matches("^(?=.*[A-Z]).{8,}$");
+        return password != null && password.length() >= 8 && password.matches(".*[A-Z].*");
     }
 }
