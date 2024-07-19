@@ -9,7 +9,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/order")
-@CrossOrigin(origins = "http://localhost:5173")
 public class OrderController {
     @Autowired
     private OrderService orderService;

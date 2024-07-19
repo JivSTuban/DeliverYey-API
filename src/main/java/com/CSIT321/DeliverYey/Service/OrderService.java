@@ -32,8 +32,8 @@ public class OrderService {
                     .orElseThrow(() -> new NoSuchElementException("Student with ID " + order.getStudent().getSid() + " not found."));
 
             // Check if the student is associated with a menu or delivery
-            if (student.getMenu() != null || student.getDelivery() != null) {
-                throw new IllegalStateException("Student cannot order if associated with a menu or delivery.");
+            if (student.getDelivery() != null) {
+                throw new IllegalStateException("Student cannot order if associated with a delivery.");
             }
 
             // Validate the contact info

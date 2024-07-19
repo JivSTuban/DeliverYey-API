@@ -1,16 +1,8 @@
 package com.CSIT321.DeliverYey.Service;
 
-import com.CSIT321.DeliverYey.Config.JwtProvider;
 import com.CSIT321.DeliverYey.Repository.StudentRepository;
 import com.CSIT321.DeliverYey.Entity.StudentEntity;
-import com.CSIT321.DeliverYey.Entity.UserType;
-import com.CSIT321.DeliverYey.Response.AuthResponse;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -47,46 +39,7 @@ public class StudentService implements UserDetailsService {
         }
     }
 
-    public ResponseEntity<?> signup(StudentEntity input) {
-        try{
-            if (studentRepository.count() > 0) {
-                if (studentRepository.findByIdNumberAndIsDeletedTrue(input.getIdNumber()) != null) {
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"message\": \"This account was already deleted. Would you like to recover this account?\"}");
-                }
-            }
-        }catch(NullPointerException e){
-            System.out.println("There are no deleted accounts yet.");
-        }
 
-        if (studentRepository.findByIdNumberAndIsDeletedFalse(input.getIdNumber()) != null) {
-            return ResponseEntity.status(HttpStatus.CONFLICT).body("{\"message\": \"ID number is already in use\"}");
-        }
-
-        if (!isValidPassword(input.getPassword())) {
-            throw new IllegalArgumentException("Invalid password format. It must be at least 8 characters with 1 uppercase letter.");
-        }
-
-        var student = new StudentEntity();
-        student.setIdNumber(input.getIdNumber());
-        student.setEmail(input.getEmail());
-        student.setPassword(passwordEncoder.encode(input.getPassword()));
-        student.setUserType(UserType.STUDENT);
-        student.setDeleted(false);
-
-        studentRepository.save(student);
-
-        Authentication authentication = new UsernamePasswordAuthenticationToken(input.getIdNumber(),input.getPassword());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = JwtProvider.generateToken(authentication);
-
-
-        AuthResponse authResponse = new AuthResponse();
-        authResponse.setJwt(token);
-        authResponse.setMessage("Register Success");
-        authResponse.setStatus(true);
-        return new ResponseEntity<AuthResponse>(authResponse, HttpStatus.OK);
-
-    }
 
     public List<StudentEntity> getAllStudent() {
         return studentRepository.findAll();
@@ -125,8 +78,5 @@ public class StudentService implements UserDetailsService {
         return msg;
     }
 
-    private boolean isValidPassword(String password) {
-        // Password should be at least 8 characters with 1 uppercase letter
-        return password.matches("^(?=.*[A-Z]).{8,}$");
-    }
+
 }

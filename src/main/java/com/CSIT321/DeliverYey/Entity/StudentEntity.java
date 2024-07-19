@@ -7,14 +7,20 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import jakarta.persistence.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
+
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 
 @Entity
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "tblstudent")
-public class StudentEntity implements Serializable {
+public class StudentEntity implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "sid")
@@ -49,11 +55,18 @@ public class StudentEntity implements Serializable {
     @JsonIgnoreProperties({"student"})
     private OrderEntity order;
 
-    @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
-    @JsonIgnoreProperties({"student"})
-    private MenuEntity menu;
 
     @OneToOne(mappedBy = "student", cascade = CascadeType.ALL)
     @JsonIgnoreProperties({"student"})
     private DeliveryEntity delivery;
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        return List.of(new SimpleGrantedAuthority(userType.name()));
+    }
+
+    @Override
+    public String getUsername() {
+        return idNumber;
+    }
 }

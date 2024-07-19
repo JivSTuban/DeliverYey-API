@@ -1,19 +1,25 @@
 package com.CSIT321.DeliverYey.Config;
 
 import com.CSIT321.DeliverYey.Service.StudentService;
+import io.jsonwebtoken.Jwt;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.Customizer;
+import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -27,8 +33,10 @@ public class SecurityConfiguration {
 
     private final StudentService studentService;
 
-    @Value("${allowed.origins}")
-    private String[] allowedOrigins;
+
+
+    @Autowired
+    JwtAuthFilter jwtAuthFilter;
 
     @Autowired
     public SecurityConfiguration(StudentService studentService) {
@@ -36,31 +44,18 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.sessionManagement(management -> management.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-                .authorizeRequests(authorize -> authorize
-                        .requestMatchers("/public/**", "/auth/**").permitAll()
-                        .requestMatchers("/order/**", "/student/**", "/orderitem/**", "/menu/**", "/delivery/**", "/product/**").hasRole("STUDENT")
+    public SecurityFilterChain securityFilterChain(HttpSecurity httpSecurity) throws Exception{
+        httpSecurity.csrf(AbstractHttpConfigurer::disable)
+                .cors(Customizer.withDefaults())
+                .authorizeHttpRequests(request-> request.requestMatchers("/auth/signin", "/auth/signup", "/public/**").permitAll()
+                        .requestMatchers("/order/**", "/student/**", "/orderitem/**", "/delivery/**", "/product/**").hasRole("STUDENT")
                         .requestMatchers("/staff/**").hasRole("STAFF")
                         .anyRequest().authenticated())
-                .addFilterBefore(new JwtTokenValidator(), BasicAuthenticationFilter.class)
-                .csrf(csrf -> csrf.disable())
-                .cors(cors -> cors.configurationSource(corsConfigurationSource()));
-                //.formLogin(form -> form.permitAll());
-        return http.build();
-    }
-
-    private CorsConfigurationSource corsConfigurationSource() {
-        return request -> {
-            CorsConfiguration ccfg = new CorsConfiguration();
-            ccfg.setAllowedOrigins(Arrays.asList(allowedOrigins));
-            ccfg.setAllowedMethods(Collections.singletonList("*"));
-            ccfg.setAllowCredentials(true);
-            ccfg.setAllowedHeaders(Collections.singletonList("*"));
-            ccfg.setExposedHeaders(Arrays.asList("Authorization"));
-            ccfg.setMaxAge(3600L);
-            return ccfg;
-        };
+                .sessionManagement(manager->manager.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authenticationProvider(authenticationProvider()).addFilterBefore(
+                        jwtAuthFilter, UsernamePasswordAuthenticationFilter.class
+                );
+        return httpSecurity.build();
     }
 
     @Bean
@@ -74,5 +69,10 @@ public class SecurityConfiguration {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    @Bean
+    public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception{
+        return authenticationConfiguration.getAuthenticationManager();
     }
 }

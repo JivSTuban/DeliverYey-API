@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/product")
-@CrossOrigin(origins = "http://localhost:5173")
 public class ProductController  {
     @Autowired
     private ProductService productService;
@@ -37,7 +36,6 @@ public class ProductController  {
         return productService.updateProduct(id, product);
     }
     @DeleteMapping("/deleteProduct")
-    @CrossOrigin(origins = "http://localhost:5173", methods = {RequestMethod.DELETE})
     public String deleteOrderItem(@RequestParam int id) {
         return productService.deleteProduct(id);
     }
