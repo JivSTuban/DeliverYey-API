@@ -1,29 +1,19 @@
-version: '3.8'
-
+version: "3.7"
 services:
-  db:
-    image: mysql:8
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-5.7
+    restart: always                       # always restart
     environment:
-      MYSQL_ROOT_PASSWORD: rootpassword
-      MYSQL_DATABASE: deliveryey
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
+      MYSQL_DATABASE: 'test'              # name of database
+      MYSQL_USER: 'sample'                # sample is the name of user
+      MYSQL_PASSWORD: 'password'          # password for sample user
+      MYSQL_ROOT_PASSWORD: 'password'     # password for root user
     ports:
-      - "3306:3306"
+      - '3306:3306'                       # host port 3306 is mapper to docker port 3306
+    expose:
+      - '3306'
     volumes:
-      - db_data:/var/lib/mysql
-
-  app:
-    build: . # This assumes you have a Dockerfile in your project root
-    environment:
-      MYSQL_HOST: db
-      MYSQL_PORT: 3306
-      MYSQL_USER: root
-      MYSQL_PASSWORD: rootpassword
-    depends_on:
-      - db
-    ports:
-      - "8080:8080"
-
+      - mysql-db:/var/lib/mysql
 volumes:
-  db_data:
+  mysql-db:
