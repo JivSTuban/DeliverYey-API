@@ -19,7 +19,6 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-
     @PostMapping(path = "/signup",
             consumes = MediaType.APPLICATION_JSON_VALUE,
             produces = MediaType.APPLICATION_JSON_VALUE)
