@@ -1,6 +1,6 @@
 # DeliverYey API
 
-DeliverYey is an API designed for making and managing online orders for Cebu Institute of Technology University's canteent. The API is built with Spring Boot and Dockerized for easy deployment. It supports JWT authentication and defines two user roles: **students** and **canteen staff**.
+DeliverYey is an API designed for making and managing online orders for Cebu Institute of Technology University's canteen. The API is built with Spring Boot and Dockerized for easy deployment. It supports JWT authentication and defines two user roles: **students** and **canteen staff**.
 
 ## Features
 
