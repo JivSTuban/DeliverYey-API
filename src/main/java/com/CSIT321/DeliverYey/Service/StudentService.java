@@ -57,7 +57,8 @@ public class StudentService implements UserDetailsService {
             //3. update the record
             student.setIdNumber(newStudentDetails.getIdNumber());
             student.setEmail(newStudentDetails.getEmail());
-
+            student.setFirstName(newStudentDetails.getFirstName());
+            student.setLastName(newStudentDetails.getLastName());
             student.setPassword(passwordEncoder.encode(newStudentDetails.getPassword()));
         }else{
             throw new NoSuchElementException("Student" + sid + "does not exist!");

@@ -47,18 +47,18 @@ public class AuthService {
             // Check if there are deleted accounts and whether the account is recoverable
             if (studentRepository.count() > 0) {
                 if (studentRepository.findByIdNumberAndIsDeletedTrue(registrationRequest.getIdNumber()) != null) {
-                    response.setMessage("{\"message\": \"This account was already deleted. Would you like to recover this account?\"}");
+                    response.setMessage("This account was already deleted. Would you like to recover this account?");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+                }else if (studentRepository.findByEmailAndIsDeletedFalse(registrationRequest.getEmail()) != null){
+                    response.setMessage("Email is already used.");
+                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+                }else if (studentRepository.findByIdNumberAndIsDeletedFalse(registrationRequest.getIdNumber()) != null) {
+                    response.setMessage("ID number is already in use.");
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
                 }
             }
         } catch (NullPointerException e) {
             System.out.println("There are no deleted accounts yet.");
-        }
-
-        // Check if the ID number is already in use
-        if (studentRepository.findByIdNumberAndIsDeletedFalse(registrationRequest.getIdNumber()) != null) {
-            response.setMessage("{\"message\": \"ID number is already in use\"}");
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
 
         // Validate password format
@@ -72,6 +72,8 @@ public class AuthService {
             var student = new StudentEntity();
             student.setIdNumber(registrationRequest.getIdNumber());
             student.setEmail(registrationRequest.getEmail());
+            student.setFirstName(registrationRequest.getFirstName());
+            student.setLastName(registrationRequest.getLastName());
             student.setPassword(passwordEncoder.encode(registrationRequest.getPassword()));
             student.setUserType(UserType.STUDENT);
             student.setDeleted(false);

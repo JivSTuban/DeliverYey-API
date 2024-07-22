@@ -35,6 +35,14 @@ public class StudentEntity implements UserDetails {
     @JsonProperty
     private String email;
 
+    @NotEmpty(message = "First name is required.")
+    @JsonProperty
+    private String firstName;
+
+    @NotEmpty(message = "Last name is required.")
+    @JsonProperty
+    private String lastName;
+
     @Column(name = "password")
     @NotEmpty(message = "Password is required.")
     @JsonProperty

@@ -8,4 +8,5 @@ public interface StudentRepository extends JpaRepository <StudentEntity, Integer
     StudentEntity findByIdNumberAndIsDeletedTrue(String idNumber);
     StudentEntity findBySidAndIsDeletedFalse(int sid);
     StudentEntity findByIdNumberAndIsDeletedFalse(String idNumber);
+    StudentEntity findByEmailAndIsDeletedFalse(String Email);
 }
