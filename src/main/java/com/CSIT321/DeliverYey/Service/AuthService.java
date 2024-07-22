@@ -123,27 +123,34 @@ public class AuthService {
 
     public ResponseEntity<ReqRes> login(ReqRes loginRequest) {
         ReqRes response = new ReqRes();
+        StudentEntity student = studentRepository.findByIdNumberAndIsDeletedFalse(loginRequest.getIdNumber());
+
+        if (student == null) {
+            response.setStatusCode(401);
+            response.setMessage("Invalid ID number.");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
+        if (!passwordEncoder.matches(loginRequest.getPassword(), student.getPassword())) {
+            response.setStatusCode(401);
+            response.setMessage("Invalid password");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
+        }
+
         try {
-            authenticationManager.authenticate(
+            Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginRequest.getIdNumber(), loginRequest.getPassword()));
-            var user = studentRepository.findByIdNumberAndIsDeletedFalse(loginRequest.getIdNumber());
-            if(user == null) {
-                throw new BadCredentialsException("User not found");
-            }
-            var jwt = jwtUtils.generateToken(user);
-            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+
+            var jwt = jwtUtils.generateToken(student);
+            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), student);
             response.setStatusCode(200);
             response.setToken(jwt);
-            response.setRole(user.getUserType().name());
+            response.setRole(student.getUserType().name());
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hrs");
             response.setMessage("Successfully Logged In");
 
             return ResponseEntity.ok(response);
-        } catch (AuthenticationException e) {
-            response.setStatusCode(401);
-            response.setMessage("Incorrect ID number or password");
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
         } catch (Exception e) {
             response.setStatusCode(500);
             response.setMessage("An unexpected error occurred: " + e.getMessage());
