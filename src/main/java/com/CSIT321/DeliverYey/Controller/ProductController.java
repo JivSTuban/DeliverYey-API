@@ -11,7 +11,7 @@ public class ProductController  {
     @Autowired
     private ProductService productService;
 
-    @PostMapping("/insertProduct")
+    @PostMapping
     public ProductEntity insertProduct(@RequestBody ProductEntity product) {
         return productService.insertProduct(product);
     }
@@ -26,16 +26,16 @@ public class ProductController  {
         return productService.getProductById(id);
     }
 
-    @GetMapping("/productImage")
+    @GetMapping("/image")
     public String getAllProduct(@RequestParam int id) {
         return productService.getProductFilenameById(id);
     }
 
-    @PutMapping("/updateProduct")
+    @PutMapping
     public ProductEntity updateProduct(@RequestBody ProductEntity product, @RequestParam int id) throws NoSuchFieldException {
         return productService.updateProduct(id, product);
     }
-    @DeleteMapping("/deleteProduct")
+    @DeleteMapping
     public String deleteOrderItem(@RequestParam int id) {
         return productService.deleteProduct(id);
     }

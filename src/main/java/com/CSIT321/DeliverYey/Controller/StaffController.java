@@ -27,8 +27,8 @@ public class StaffController {
         return staffService.updateStaff(staffId, newStaffDetails);
     }
 
-    @DeleteMapping("/deleteStaff/{staffId}")
-    public String deleteStaff(@PathVariable int staffId) {
+    @DeleteMapping
+    public String deleteStaff(@RequestParam int staffId) {
         return staffService.deleteStaff(staffId);
     }
 }

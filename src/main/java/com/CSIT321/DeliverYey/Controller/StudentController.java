@@ -21,13 +21,13 @@ public class StudentController {
         return studentService.getAllStudent();
     }
 
-    @PutMapping("/update")
+    @PutMapping
     public StudentEntity updateStudent(@RequestParam int sid, @RequestBody StudentEntity newStudentDetails) {
         return studentService.updateStudent(sid, newStudentDetails);
     }
 
-    @DeleteMapping("/deleteStudent/{sid}")
-    public String deleteStudent(@PathVariable int sid) {
+    @DeleteMapping
+    public String deleteStudent(@RequestParam int sid) {
         return studentService.deleteStudent(sid);
     }
 }

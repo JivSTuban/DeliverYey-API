@@ -19,16 +19,12 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
-    @PostMapping(path = "/signup",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/signup")
     public ResponseEntity<ReqRes> registerUser(@Valid @RequestBody ReqRes input) {
         return authService.register(input);
     }
 
-    @PostMapping(path = "/signin",
-            consumes = MediaType.APPLICATION_JSON_VALUE,
-            produces = MediaType.APPLICATION_JSON_VALUE)
+    @PostMapping(path = "/signin")
     public ResponseEntity<ReqRes> loginStudent(@Valid @RequestBody ReqRes input) {
         return authService.login(input);
     }

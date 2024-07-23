@@ -13,23 +13,23 @@ public class OrderController {
     @Autowired
     private OrderService orderService;
 
-    @PostMapping("/insertOrder")
+    @PostMapping
     public OrderEntity insertOrder(@RequestBody OrderEntity order) {
         return orderService.insertOrder(order);
     }
 
-    @GetMapping("/getAllOrder")
+    @GetMapping
     public List<OrderEntity> getAllOrder() {
         return orderService.getAllOrder();
     }
 
-    @PutMapping("/updateOrder")
+    @PutMapping
     public OrderEntity updateOrder(@RequestParam int orderId, @RequestBody OrderEntity newOrderDetails) {
         return orderService.updateOrder(orderId, newOrderDetails);
     }
 
-    @DeleteMapping("/deleteOrder/{orderId}")
-    public String deleteOrder(@PathVariable int orderId) {
+    @DeleteMapping
+    public String deleteOrder(@RequestParam int orderId) {
         return orderService.deleteOrder(orderId);
     }
 }

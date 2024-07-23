@@ -13,23 +13,23 @@ public class DeliveryController {
     @Autowired
     private DeliveryService deliveryService;
 
-    @PostMapping("/insertDelivery")
+    @PostMapping
     public DeliveryEntity insertDelivery(@RequestBody DeliveryEntity delivery) {
         return deliveryService.insertDelivery(delivery);
     }
 
-    @GetMapping("/getAllDelivery")
+    @GetMapping
     public List<DeliveryEntity> getAllDelivery(){
         return deliveryService.getAllDelivery();
     }
 
-    @PutMapping("/updateDelivery")
+    @PutMapping
     public DeliveryEntity updateDelivery(@RequestParam Long deliveryId, @RequestBody DeliveryEntity newDeliveryDetails){
         return deliveryService.updateDelivery(deliveryId, newDeliveryDetails);
     }
 
-    @DeleteMapping("/deleteDelivery/{deliveryId}")
-    public String deleteDelivery(@PathVariable Long deliveryId){
+    @DeleteMapping
+    public String deleteDelivery(@RequestBody Long deliveryId){
         return deliveryService.deleteDelivery(deliveryId);
     }
 }

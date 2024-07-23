@@ -48,12 +48,15 @@ public class AuthService {
             if (studentRepository.count() > 0) {
                 if (studentRepository.findByIdNumberAndIsDeletedTrue(registrationRequest.getIdNumber()) != null) {
                     response.setMessage("This account was already deleted. Would you like to recover this account?");
-                    return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+                    response.setStatusCode(410);
+                    return ResponseEntity.status(HttpStatus.GONE).body(response);
                 }else if (studentRepository.findByEmailAndIsDeletedFalse(registrationRequest.getEmail()) != null){
                     response.setMessage("Email is already used.");
+                    response.setStatusCode(409);
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
                 }else if (studentRepository.findByIdNumberAndIsDeletedFalse(registrationRequest.getIdNumber()) != null) {
                     response.setMessage("ID number is already in use.");
+                    response.setStatusCode(409);
                     return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
                 }
             }
@@ -64,6 +67,7 @@ public class AuthService {
         // Validate password format
         if (!isValidPassword(registrationRequest.getPassword())) {
             response.setMessage("Invalid password format. It must be at least 8 characters with 1 uppercase letter.");
+            response.setStatusCode(400);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
