@@ -43,7 +43,7 @@ DeliverYey is an API designed for making and managing online orders for Cebu Ins
 
 ### Running with Docker
 
-1. **Build and run the Docker Image**:
+1. **Build and run the Docker image and contaniner**:
 
     ```sh
     docker compose up
