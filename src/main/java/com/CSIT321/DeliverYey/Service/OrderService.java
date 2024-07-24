@@ -42,7 +42,6 @@ public class OrderService {
             }
 
             // Update the student's user type and save it
-            student.setUserType(UserType.ORDER);
             studentRepository.save(student);
 
             // Set the student for the order and save the order
@@ -71,15 +70,19 @@ public class OrderService {
             order = orderRepository.findById(orderId).get();
 
             //2. update the record
-            order.setOrderType(newOrderDetails.getOrderType());
             order.setContactInfo(newOrderDetails.getContactInfo());
             order.setLocation(newOrderDetails.getLocation());
             order.setPaymentMethod(newOrderDetails.getPaymentMethod());
+            order.setPrice(newOrderDetails.getPrice());
+            order.setTotalAmount(newOrderDetails.getTotalAmount());
+            order.setFoodName(newOrderDetails.getFoodName());
+            order.setQuantity(newOrderDetails.getQuantity());
+            order.setLocation(newOrderDetails.getLocation());
+
         } catch (NoSuchElementException ex) {
             throw new NoSuchElementException("Student" + orderId + "does not exist!");
-        } finally {
-            return orderRepository.save(order);
         }
+        return orderRepository.save(order);
     }
 
 

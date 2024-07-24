@@ -19,20 +19,21 @@ public class OrderEntity implements Serializable {
     @Column(name = "order_id")
     private int orderId;
 
-    @Column(name = "order_type")
-    private String orderType;
-
     @Column(name = "contact_information")
     private String contactInfo;
 
     private String location;
 
+    private double price;
+
+    private double totalAmount;
+
+    private String foodName;
+
+    private int quantity;
+
     @Column(name = "payment_method")
     private String paymentMethod;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "user_type")
-    private UserType userType = UserType.ORDER;
 
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "sid", referencedColumnName = "sid", unique = true)

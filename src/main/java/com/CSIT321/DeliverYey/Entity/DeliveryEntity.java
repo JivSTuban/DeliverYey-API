@@ -30,9 +30,9 @@ public class DeliveryEntity implements Serializable {
     @Column(name = "notes")
     private String notes;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "user_type")
-    private UserType userType = UserType.DELIVERY;
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    private OrderEntity order;
 
     @OneToOne
     @JoinColumn(name = "sid")

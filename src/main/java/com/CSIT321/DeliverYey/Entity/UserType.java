@@ -4,7 +4,4 @@ public enum UserType {
     STUDENT,
     STAFF,
     ORDER,
-    ORDERITEM,
-    MENU,
-    DELIVERY
 }

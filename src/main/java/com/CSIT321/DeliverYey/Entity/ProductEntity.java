@@ -19,18 +19,15 @@ public class ProductEntity implements Serializable {
     @Column(name = "product_id")
     private int productId;
 
-    @Column(name = "product_name")
-    private String productName;
+    private String name;
 
-    @Column(name = "product_filename")
-    private String productFilename;
+    private String filename;
 
-    @Column(name = "product_price")
-    private double productPrice;
+    private String description;
 
-    @Column(name = "product_category")
-    private String productCategory;
+    private double price;
 
-    @Column(name = "product_quantity")
-    private int productQuantity;
+    private String category;
+
+    private int quantity;
 }

@@ -14,7 +14,7 @@ public class ProductService {
     ProductRepository productRepository;
 
     public ProductEntity insertProduct(ProductEntity entity){
-        if (getProductByName(entity.getProductName()) != null){
+        if (getProductByName(entity.getName()) != null){
             throw new IllegalArgumentException("Product already exists.");
         }
         return productRepository.save(entity);
@@ -25,13 +25,13 @@ public class ProductService {
     public ProductEntity getProductById(int id) {return productRepository.findById(id).get();}
 
     public ProductEntity getProductByName(String name) {
-        return productRepository.findByProductName(name);
+        return productRepository.findByName(name);
     }
 
     public String getProductFilenameById(int id) {
         ProductEntity product = productRepository.findById(id).orElse(null);
         if (product != null) {
-            return product.getProductFilename();
+            return product.getFilename();
         } else {
             return null;
         }
@@ -42,11 +42,12 @@ public class ProductService {
         if (productRepository.findById(id).isPresent()){
             product = productRepository.findById(id).get();
 
-            product.setProductName(newProductDetails.getProductName());
-            product.setProductFilename(newProductDetails.getProductFilename());
-            product.setProductPrice(newProductDetails.getProductPrice());
-            product.setProductCategory(newProductDetails.getProductCategory());
-            product.setProductQuantity(newProductDetails.getProductQuantity());
+            product.setName(newProductDetails.getName());
+            product.setFilename(newProductDetails.getFilename());
+            product.setDescription(newProductDetails.getDescription());
+            product.setPrice(newProductDetails.getPrice());
+            product.setCategory(newProductDetails.getCategory());
+            product.setQuantity(newProductDetails.getQuantity());
 
             productRepository.save(product);
 

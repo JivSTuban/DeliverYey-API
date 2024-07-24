@@ -30,14 +30,6 @@ public class DeliveryService {
         try {
             // Save the delivery
             deliveryRepository.save(delivery);
-
-            // Assuming you want to update the student's user type if it's not null
-            StudentEntity student = delivery.getStudent();
-            if (student != null) {
-                student.setUserType(UserType.DELIVERY);
-                studentRepository.save(student);
-            }
-
             return delivery;
         } catch (Exception e) {
             // Log the exception
@@ -48,14 +40,7 @@ public class DeliveryService {
     }
 
     public List<DeliveryEntity> getAllDelivery() {
-        List<DeliveryEntity> deliveryList = deliveryRepository.findAll();
-
-        // Initialize the student association for each delivery
-        deliveryList.forEach((delivery) -> {
-            Hibernate.initialize(delivery.getStudent());
-        });
-
-        return deliveryList;
+        return deliveryRepository.findAll();
     }
 
     public DeliveryEntity updateDelivery(Long deliveryId, DeliveryEntity newDeliveryDetails) {
