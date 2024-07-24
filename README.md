@@ -43,18 +43,12 @@ DeliverYey is an API designed for making and managing online orders for Cebu Ins
 
 ### Running with Docker
 
-1. **Build the Docker Image**:
+1. **Build and run the Docker Image**:
 
     ```sh
-    docker build -t deliver-yey .
+    docker compose up
     ```
-
-2. **Run the Docker Container**:
-
-    ```sh
-    docker run -p 8080:8080 deliver-yey
-    ```
-
+    
 3. **Access the API**: Open your browser or use a tool like Postman to access `http://localhost:8080`.
 
 ## Dependencies
